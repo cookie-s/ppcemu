@@ -1,6 +1,10 @@
 
-.PHONY: all dis
+.PHONY: all clean dis
+
 all: test
+
+clean:
+	rm test
 
 dis:
 	/usr/local/ppc/bin/powerpcle-linux-objdump -d test
