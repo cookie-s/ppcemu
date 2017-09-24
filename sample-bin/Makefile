@@ -1,13 +1,18 @@
+CC := /usr/local/ppc/bin/powerpcle-linux-gcc
+OBJDUMP := /usr/local/ppc/bin/powerpcle-linux-objdump
 
 .PHONY: all clean dis
 
-all: test
+all: test1 test2
 
 clean:
-	rm test
+	rm test1 test2
 
 dis:
-	/usr/local/ppc/bin/powerpcle-linux-objdump -d test
+	$(OBJDUMP) -d test1
 
-test: test.c
-	/usr/local/ppc/bin/powerpcle-linux-gcc -nostdlib -e main test.c -o test
+test1: test1.c
+	$(CC) -nostdlib -e main $< -o $@
+
+test2: test2.c
+	$(CC) -nostdlib -e main $< -o $@
