@@ -1,0 +1,2 @@
+
+#define E_ILLEGAL_INSTRUCTION 10
