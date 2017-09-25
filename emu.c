@@ -92,6 +92,7 @@ uint32_t chgendian(uint32_t in) {
 int step() {
     uint32_t instr = *(uint32_t*)v2p(reg_pc);
     uint8_t opcode = (instr >> (31-5)) & ((1<<6)-1);
+    printf("%d\n", opcode);
 
     // I-Form
     uint32_t i_li = (instr >> 2) & ((1<<24)-1);
@@ -116,7 +117,12 @@ int step() {
 
     reg_pc += 4;
     switch(opcode) {
-        case 031: // X-Form
+        case 14: // addi
+            reg_gr[d_D] = d_A ? reg_gr[d_A] + d_d : d_d;
+            break;
+        case 19: // TODO
+            break;
+        case 31: // X-Form
             {
                 uint8_t x_D = (instr >> 20) & ((1<<5)-1); // or S
                 uint8_t x_A = (instr >> 16) & ((1<<5)-1);
@@ -126,7 +132,7 @@ int step() {
                 uint16_t x_XO = (instr >> 1) & ((1<<10)-1);
                 uint8_t x_Rc = d_D & 1;
                 switch(x_XO) {
-                    case 0444:
+                    case 444: // or
                         reg_gr[x_A] = reg_gr[x_D] | reg_gr[x_B];
                         if(x_Rc) {
                             reg_cr = 0;
@@ -135,20 +141,30 @@ int step() {
                             // FIXME What does means LT, GT, SO ?
                         }
                         break;
+                    default:
+                        return E_ILLEGAL_INSTRUCTION;
                 }
             }
             break;
-        case 036: //stw
+        case 32: //lwz
+            EA = d_A ? reg_gr[d_A] + d_d : d_d;
+            reg_gr[d_D] = *(uint32_t*)v2p(EA);
+            break;
+        case 36: //stw
             EA = d_d + (d_A == 0 ? 0 : reg_gr[d_A]);
             *(uint32_t*)v2p(EA) = reg_gr[d_D];
             break;
-        case 037: //stwu
+        case 37: //stwu
             if(d_A == 0) return E_ILLEGAL_INSTRUCTION;
             EA = reg_gr[d_A] + d_d;
             *(uint32_t*)v2p(EA) = reg_gr[d_D];
             reg_gr[d_A] = EA;
             break;
-        case 045: //sthu
+        case 44: //sth
+            EA = d_d + (d_A == 0 ? 0 : reg_gr[d_A]);
+            *(uint16_t*)v2p(EA) = reg_gr[d_D] & 0xFFFF;
+            break;
+        case 45: //sthu
             if(d_A == 0) return E_ILLEGAL_INSTRUCTION;
             EA = reg_gr[d_A] + d_d;
             *(uint16_t*)v2p(EA) = reg_gr[d_D] & 0xFFFF;
@@ -212,7 +228,7 @@ int main(int argc, char **argv) {
 
     reg_pc = elf_hdr->e_entry;
     memset(reg_gr, 0, sizeof(reg_gr));
-    reg_gr[1] = STACK_TOP + PAGE_SIZE - 0x20;
+    reg_gr[1] = STACK_TOP + PAGE_SIZE - 0x100;
     reg_gr[2] = 0; // FIXME What is TOC???
 
     while(!step());

@@ -1,2 +1,3 @@
 
 #define E_ILLEGAL_INSTRUCTION 10
+#define E_EXIT 20

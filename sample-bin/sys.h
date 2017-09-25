@@ -2,6 +2,7 @@
 #define SYS_H
 
 #define SYS_OUT 3
+#define SYS_EXIT 10
 
 int syscall(int r0, int r3, int r4, int r5, int r6, int r7, int r8, int r9) {
     int ret = 0;
@@ -23,6 +24,9 @@ int syscall(int r0, int r3, int r4, int r5, int r6, int r7, int r8, int r9) {
 }
 int out(int o) {
     return syscall(SYS_OUT, o, 0, 0, 0, 0, 0, 0);
+}
+int exit(int code) {
+    return syscall(SYS_EXIT, code, 0, 0, 0, 0, 0, 0);
 }
 
 #endif

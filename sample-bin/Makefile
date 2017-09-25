@@ -12,7 +12,7 @@ dis:
 	$(OBJDUMP) -d test1
 
 test1: test1.c
-	$(CC) -nostdlib -e main $< -o $@
+	$(CC) -nostdlib $< -o $@
 
 test2: test2.c
-	$(CC) -nostdlib -e main $< -o $@
+	$(CC) -nostdlib $< /usr/local/ppc/lib/crt1.o -o $@
